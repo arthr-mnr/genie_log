@@ -13,15 +13,15 @@
 #include "common.h"
 #include "msg_struct.h"
 
-int send_message(int fd, struct message *msgstruct, const char *payload);
+int send_message(int file_descriptor, struct message *msgstruct, const char *payload);
 int handle_connect(const char *client_ip, int client_port);
-void handle_client_input(char *input_buffer, struct pollfd *fds, int server_fd, char *client_nickname);
-void handle_server_message(char *recv_buffer, struct pollfd *fds, int server_fd);
-void send_file_request(int server_fd, const char *receiver_nick, const char *file_name_arg);
-void handle_file_request(int server_fd, struct message *msgstruct, const char *payload);
-void send_file_accept(int server_fd, struct message *message);
-void send_file_reject(int server_fd, const char *sender_nick);
-void handle_file_accept(int server_fd, struct message *msgstruct);
+void handle_client_input(char *input_buffer, struct pollfd *file_descriptor_set, int server_file_descriptor, char *client_nickname);
+void handle_server_message(char *recv_buffer, struct pollfd *file_descriptor_set, int server_file_descriptor);
+void send_file_request(int server_file_descriptor, const char *receiver_nick, const char *file_name_arg);
+void handle_file_request(int server_file_descriptor, struct message *msgstruct, const char *payload);
+void send_file_accept(int server_file_descriptor, struct message *message);
+void send_file_reject(int server_file_descriptor, const char *sender_nick);
+void handle_file_accept(int server_file_descriptor, struct message *msgstruct);
 void send_file_to_receiver(const char *ip, int port, const char *file_name);
 void start_file_server(int port);
 void receive_file(int conn_fd);
@@ -35,11 +35,13 @@ char client_nickname[NICK_LEN] = "";
 char file_name[INFOS_LEN] = "";
 
 int main(int argc, char *argv[]) {
-    int server_fd;
-    struct addrinfo hints, *res, *p;
+    int server_file_descriptor;
+    struct addrinfo hints, *res, *pointerToRes; // hints --> getaddrinfo() --> res
+                                                // res --> [addrinfo] -> [addrinfo] -> ... -> [addrinfo] -> NULL
     char *server_ip;
     char *server_port;
 
+    // Récupération des informations du serveur passées en argument
     if (argc != 3) {
         fprintf(stderr, "Usage: %s <server_ip> <server_port>\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -59,21 +61,23 @@ int main(int argc, char *argv[]) {
     }
 
     // Connexion au serveur
-    for (p = res; p != NULL; p = p->ai_next) {
-        server_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-        if (server_fd < 0) {
+    // On essaie toutes les adresses possibles retournées par getaddrinfo() 
+    for (pointerToRes = res; pointerToRes != NULL; pointerToRes = pointerToRes->ai_next) {
+        server_file_descriptor = socket(pointerToRes->ai_family, pointerToRes->ai_socktype, pointerToRes->ai_protocol);
+        if (server_file_descriptor < 0) {
             continue;
         }
 
-        if (connect(server_fd, p->ai_addr, p->ai_addrlen) == -1) {
-            close(server_fd);
+        if (connect(server_file_descriptor, pointerToRes->ai_addr, pointerToRes->ai_addrlen) == -1) {
+            close(server_file_descriptor);
             continue;
         }
 
         break;
     }
 
-    if (p == NULL) {
+    // Si aucune adresse ne fonctionne
+    if (pointerToRes == NULL) {
         fprintf(stderr, "Impossible de se connecter au serveur\n");
         freeaddrinfo(res);
         exit(EXIT_FAILURE);
@@ -84,33 +88,33 @@ int main(int argc, char *argv[]) {
     printf("Connecté au serveur %s:%s\n", server_ip, server_port);
 
     // Variables pour le polling
-    struct pollfd fds[2];
-    fds[0].fd = STDIN_FILENO; // Entrée standard
-    fds[0].events = POLLIN;
-    fds[1].fd = server_fd;    // Socket du serveur
-    fds[1].events = POLLIN;
+    struct pollfd file_descriptor_set[2];
+    file_descriptor_set[0].fd = STDIN_FILENO; // Entrée standard
+    file_descriptor_set[0].events = POLLIN;
+    file_descriptor_set[1].fd = server_file_descriptor;    // Socket du serveur
+    file_descriptor_set[1].events = POLLIN;
 
     char input_buffer[BUFFER_SIZE];
     char recv_buffer[BUFFER_SIZE];
 
     while (1) {
-        int poll_count = poll(fds, 2, -1);
+        int poll_count = poll(file_descriptor_set, 2, -1);
         if (poll_count == -1) {
             perror("poll");
             break;
         }
 
-        handle_client_input(input_buffer, fds, server_fd, client_nickname);
+        handle_client_input(input_buffer, file_descriptor_set, server_file_descriptor, client_nickname);
 
-        handle_server_message(recv_buffer, fds, server_fd);
+        handle_server_message(recv_buffer, file_descriptor_set, server_file_descriptor);
     }
 
-    close(server_fd);
+    close(server_file_descriptor);
     return EXIT_SUCCESS;
 }
 
 // Fonction pour envoyer des messages de manière fiable
-int send_message(int fd, struct message *msgstruct, const char *payload) {
+int send_message(int file_descriptor, struct message *msgstruct, const char *payload) {
     struct message net_msgstruct = *msgstruct;
 
     // Convertir les champs numériques en ordre d'octets réseau
@@ -119,11 +123,11 @@ int send_message(int fd, struct message *msgstruct, const char *payload) {
 
     int total_sent = 0;
     int len = sizeof(struct message);
-    char *ptr = (char *)&net_msgstruct;
+    char *pointer_net_msgstruct = (char *)&net_msgstruct;
 
     // Envoyer l'en-tête du message
     while (total_sent < len) {
-        int sent = write(fd, ptr + total_sent, len - total_sent);
+        int sent = write(file_descriptor, pointer_net_msgstruct + total_sent, len - total_sent);
         if (sent <= 0) {
             perror("Erreur lors de l'envoi du message");
             return -1;
@@ -132,13 +136,13 @@ int send_message(int fd, struct message *msgstruct, const char *payload) {
     }
 
     // Envoyer le payload si nécessaire
-    if (ntohl(msgstruct->pld_len) > 0 && payload != NULL) {
+    if (ntohl(msgstruct->pld_len) > 0 && payload != NULL) { // ntohl(x) is a macro that converts a 32-bit integer from network byte order to host byte order
         total_sent = 0;
         len = ntohl(msgstruct->pld_len);
-        ptr = (char *)payload;
+        pointer_net_msgstruct = (char *)payload;
 
         while (total_sent < len) {
-            int sent = write(fd, ptr + total_sent, len - total_sent);
+            int sent = write(file_descriptor, pointer_net_msgstruct + total_sent, len - total_sent);
             if (sent <= 0) {
                 perror("Erreur lors de l'envoi du payload");
                 return -1;
@@ -151,8 +155,8 @@ int send_message(int fd, struct message *msgstruct, const char *payload) {
 
 
 int handle_connect(const char *client_ip, int client_port) {
-	struct addrinfo hints, *result, *rp;
-	int sfd;
+	struct addrinfo hints, *result, *result_pointer;
+	int socket_file_descriptor;
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -163,20 +167,21 @@ int handle_connect(const char *client_ip, int client_port) {
 		perror("getaddrinfo()");
 		exit(EXIT_FAILURE);
 	}
-	for (rp = result; rp != NULL; rp = rp->ai_next) {
-		sfd = socket(rp->ai_family, rp->ai_socktype,rp->ai_protocol);
-		if (sfd == -1) {
+    // On essaie toutes les adresses possibles retournées dans result
+	for (result_pointer = result; result_pointer != NULL; result_pointer = result_pointer->ai_next) {
+		socket_file_descriptor = socket(result_pointer->ai_family, result_pointer->ai_socktype,result_pointer->ai_protocol);
+		if (socket_file_descriptor == -1) {
 			continue;
 		}
-		if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1) {
+		if (connect(socket_file_descriptor, result_pointer->ai_addr, result_pointer->ai_addrlen) != -1) {
 			break;
 		}
-		close(sfd);
+		close(socket_file_descriptor);
 	}
-	if (rp == NULL) {
+	if (result_pointer == NULL) {
 		fprintf(stderr, "Could not connect\n");
 		exit(EXIT_FAILURE);
 	}
 	freeaddrinfo(result);
-	return sfd;
+	return socket_file_descriptor;
 }
