@@ -10,7 +10,9 @@ test("password w/ less than 8 characters should be invalid", () => {
 
 
 test("password w/out a number should be invalid", () => {
-    const checkLength1 = "abcdefghij123"
+    const checkNumber1 = "abcdefghij123"
+    const checkNumber2 = "azertyuio"
     
-    expect(validatePassword(checkLength1)).toBe(true);
+    expect(validatePassword(checkNumber1)).toBe(true);
+    expect(validatePassword(checkNumber2)).toBe(false);
 });
