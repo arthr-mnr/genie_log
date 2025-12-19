@@ -1,5 +1,6 @@
 const bankDAO = require("./bankDAO");
 const bank = require("./bank");
+const bankTransfer = require("./bankTransfer");
 
 test("retrieveBalance is called", () => {
     const retrieveBalanceSpy = jest.spyOn(bankDAO, "retrieveBalance");
@@ -24,4 +25,14 @@ test("getBalance retourne le solde", () => {
     const retrieveBalanceSpy = jest.spyOn(bankDAO, "retrieveBalance").mockReturnValue(value);
 
     expect(bank.getBalance()).toBe(value);
+});
+
+test("bankTransfert appelé avec les bons paramètres", () => {
+    const accountId = 123
+    const amout = 1000000
+    const bankTransferSpy = jest.spyOn(bankTransfer, "transfer");
+
+    bank.transferMoney(accountId, amout)
+
+    expect(bankTransferSpy).toHaveBeenCalledWith(accountId, amout);
 });
