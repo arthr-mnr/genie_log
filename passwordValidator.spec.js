@@ -1,8 +1,8 @@
 const validatePassword = require('./passwordValidator');
 
 test("password w/ less than 8 characters should be invalid", () => {
-    const checkLength1 = "abcdefghij"
-    const checkLength2 = "foo"
+    const checkLength1 = "abcdefghij1"
+    const checkLength2 = "foo1"
     
     expect(validatePassword(checkLength1)).toBe(true);
     expect(validatePassword(checkLength2)).toBe(false);
