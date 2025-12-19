@@ -1,0 +1,24 @@
+{
+  "name": "genie_log",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arthr-mnr/genie_log.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/arthr-mnr/genie_log/issues"
+  },
+  "homepage": "https://github.com/arthr-mnr/genie_log#readme",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
