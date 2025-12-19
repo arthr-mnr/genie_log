@@ -16,3 +16,9 @@ test("password w/out a number should be invalid", () => {
     expect(validatePassword(checkNumber1)).toBe(true);
     expect(validatePassword(checkNumber2)).toBe(false);
 });
+
+test("password w/out a letter should be invalid", () => {
+    const checkNumber1 = "abcdefghij123"
+    
+    expect(validatePassword(checkNumber1)).toBe(true);
+});
