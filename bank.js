@@ -5,9 +5,15 @@ const bank = {
     getBalance(accountId) {
         return bankDAO.retrieveBalance(accountId);
     },
-    transferMoney(accountId, amount) {
-        bankTransfer.transfer(accountId, amount)
-        bankDAO.debitAccount(accountId, amount)
+
+    async transferMoney(accountId, amount) {
+        try {
+            const result = await bankTransfer.transfer(accountId, amount);
+            return await bankDAO.debitAccount(accountId, amount);
+        }
+        catch (e) {
+            console.error('Erreur lors du transfert:', e);
+        }
     }
 };
 
