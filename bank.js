@@ -7,6 +7,7 @@ const bank = {
     },
     transferMoney(accountId, amount) {
         bankTransfer.transfer(accountId, amount)
+        bankDAO.debitAccount(accountId, amount)
     }
 };
 
