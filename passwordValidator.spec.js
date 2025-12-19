@@ -5,5 +5,5 @@ test("password w/ less than 8 characters should be invalid", () => {
     const checkLength2 = "foo"
     
     expect(validatePassword(checkLength1)).toBe(true);
-    expect(validatePassword(checkLength1)).toBe(false);
+    expect(validatePassword(checkLength2)).toBe(false);
 });

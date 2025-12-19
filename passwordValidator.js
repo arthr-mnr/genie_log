@@ -1,5 +1,5 @@
 function validatePassword(password) {
-    return true
+    return password.length > 7
 }
 
 module.exports = validatePassword;
