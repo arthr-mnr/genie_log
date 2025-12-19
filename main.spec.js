@@ -3,7 +3,7 @@ const bank = require("./bank");
 const bankTransfer = require("./bankTransfer");
 
 afterEach (() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
 });
 
 test("retrieveBalance is called", () => {
