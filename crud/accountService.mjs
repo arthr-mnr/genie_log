@@ -1,5 +1,6 @@
 import { Account } from "./account.mjs";
 import { accountDAO } from "./accountDAO.mjs";
+import { ACCOUNT_LIST } from "./database.mjs";
 
 export const accountService = {
   addAccount(lastName, firstName) {
@@ -7,8 +8,20 @@ export const accountService = {
     accountDAO.insertAccount(account);
   },
   getAccountList() {
-    console.log(accountDAO.retrieveAccountList());
+    return accountDAO.retrieveAccountList();
   },
-  saveAccount(id, lastName, firstName) {},
+  saveAccount(id, lastName, firstName) {
+    let index = ACCOUNT_LIST.findIndex(a => a.id == id)
+
+    if (index != -1) {
+      let account = ACCOUNT_LIST[index];
+      account.lastName = lastName;
+      account.firstName = firstName;
+      accountDAO.updateAccount(account);
+    }
+    else {
+      console.log("Index not found")
+    }
+  },
   getAccount(id) {},
 };
