@@ -6,7 +6,9 @@ export const accountService = {
     const account = new Account(null, lastName, firstName, null);
     accountDAO.insertAccount(account);
   },
-  getAccountList() {},
+  getAccountList() {
+    console.log(accountDAO.retrieveAccountList());
+  },
   saveAccount(id, lastName, firstName) {},
   getAccount(id) {},
 };

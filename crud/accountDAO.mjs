@@ -6,7 +6,9 @@ export const accountDAO = {
     console.log("Contenu de la base de données :");
     console.log(ACCOUNT_LIST);
   },
-  retrieveAccountList() {},
+  retrieveAccountList() {
+    return ACCOUNT_LIST.map(a => ({ id: a.id, lastName: a.lastName, firstName: a.firstName }));
+  },
   updateAccount(account) {},
   retrieveAccount(id) {},
 };
