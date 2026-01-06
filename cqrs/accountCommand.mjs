@@ -39,5 +39,9 @@ export const accountCommand = {
         queryDatabase.accountSummaryList[index].firstName = firstName;
         console.log("Contenu de queryDatabase mis à jour :")
         console.log(queryDatabase.accountSummaryList)
+
+        accountCache[id] = {name: lastName + ' ' + firstName}
+        console.log("Contenu du cache mis à jour :")
+        console.log(accountCache)
     },
 };
