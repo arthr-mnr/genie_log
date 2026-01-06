@@ -11,10 +11,8 @@ export const accountService = {
     return accountDAO.retrieveAccountList();
   },
   saveAccount(id, lastName, firstName) {
-    let index = ACCOUNT_LIST.findIndex(a => a.id == id)
-
-    if (index != -1) {
-      let account = ACCOUNT_LIST[index];
+    const account = accountDAO.restore(id);
+    if (account) {
       account.lastName = lastName;
       account.firstName = firstName;
       accountDAO.updateAccount(account);

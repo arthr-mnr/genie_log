@@ -1,3 +1,4 @@
+import { Account } from "./account.mjs";
 import { ACCOUNT_LIST } from "./database.mjs";
 
 export const accountDAO = {
@@ -21,4 +22,8 @@ export const accountDAO = {
     let res = {id: account.id, name: account.lastName + ' ' + account.firstName}
     return res
   },
+  restore(id) {
+    let account = ACCOUNT_LIST.find(a => a.id == id)
+    return new Account(account.id, account.lastName, account.firstName, account.creationDate)
+  }
 };
