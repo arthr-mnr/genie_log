@@ -25,5 +25,11 @@ export const accountCommand = {
         else {
           console.log("Index not found")
         }
+
+        const index = queryDatabase.accountSummaryList.findIndex(a => a.id === id);
+        queryDatabase.accountSummaryList[index].lastName = lastName;
+        queryDatabase.accountSummaryList[index].firstName = firstName;
+        console.log("Contenu de queryDatabase mis à jour :")
+        console.log(queryDatabase.accountSummaryList)
     },
 };
