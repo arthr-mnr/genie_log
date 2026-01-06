@@ -23,5 +23,7 @@ export const accountService = {
       console.log("Index not found")
     }
   },
-  getAccount(id) {},
+  getAccount(id) {
+    return accountDAO.retrieveAccount(id);
+  },
 };

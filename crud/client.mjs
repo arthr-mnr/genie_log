@@ -7,3 +7,7 @@ let liste = accountService.getAccountList()
 console.log(liste)
 
 accountService.saveAccount(liste[1].id, "Meunier", "Arthur")
+
+let account = accountService.getAccount(liste[1].id)
+console.log("Compte :")
+console.log(account)

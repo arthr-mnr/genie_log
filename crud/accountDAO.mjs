@@ -15,5 +15,10 @@ export const accountDAO = {
     console.log("Contenu mis à jour :");
     console.log(ACCOUNT_LIST);
   },
-  retrieveAccount(id) {},
+  retrieveAccount(id) {
+    const index = ACCOUNT_LIST.findIndex(a => a.id === id);
+    let account = ACCOUNT_LIST[index];
+    let res = {id: account.id, name: account.lastName + ' ' + account.firstName}
+    return res
+  },
 };
