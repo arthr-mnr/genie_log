@@ -1,9 +1,10 @@
 import { Account } from "./account.mjs";
 import { ACCOUNT_LIST } from "./database.mjs";
+import { queryDatabase } from "./queryDatabase.mjs";
 
 export const accountQueryDAO = {
     retrieveAccountList() {
-        return ACCOUNT_LIST.map(a => ({ id: a.id, lastName: a.lastName, firstName: a.firstName }));
+        return queryDatabase.accountSummaryList;
     },
     retrieveAccount(id) {
         const index = ACCOUNT_LIST.findIndex(a => a.id === id);
