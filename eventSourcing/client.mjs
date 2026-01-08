@@ -15,4 +15,4 @@ console.log("Compte :")
 console.log(account)
 
 console.log("eventStore :")
-console.log(eventStore)
+console.log(eventStore.eventList)

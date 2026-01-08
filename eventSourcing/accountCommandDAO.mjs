@@ -1,4 +1,6 @@
 import { ACCOUNT_LIST } from "./database.mjs";
+import { Event } from "./event.mjs";
+import { eventStore } from "./eventStore.mjs";
 
 export const accountCommandDAO = {
     insertAccount(account) {
@@ -6,10 +8,13 @@ export const accountCommandDAO = {
         console.log("Contenu de la base de données :");
         console.log(ACCOUNT_LIST);
     },
-    updateAccount(account) {
-        const index = ACCOUNT_LIST.findIndex(a => a.id === account.id);
-        ACCOUNT_LIST[index] = account;
-        console.log("Contenu mis à jour :");
-        console.log(ACCOUNT_LIST);
+    updateAccount(account) {    
+        const event = new Event(
+            "accountModified",
+            account.id,
+            account,
+        );
+
+        eventStore.addEvent(event)
     },
 };
