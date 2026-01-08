@@ -1,13 +1,24 @@
 import { Account } from "./account.mjs";
 import { accountCommandDAO } from "./accountCommandDAO.mjs";
 import { accountQueryDAO } from "./accountQueryDAO.mjs";
-import {queryDatabase} from "./queryDatabase.mjs"
+import { queryDatabase } from "./queryDatabase.mjs"
 import { accountCache } from "./cache.mjs";
+import { Event } from "./event.mjs"
+import { eventStore } from "./eventStore.mjs";
 
 export const accountCommand = {
     addAccount(lastName, firstName) {
         const account = new Account(null, lastName, firstName, null);
-        accountCommandDAO.insertAccount(account);
+        // accountCommandDAO.insertAccount(account);
+
+        const event = new Event(
+            "accountAdded",
+            account.id,
+            account,
+            account.creationDate
+        );
+
+        eventStore.addEvent(event)
 
         queryDatabase.accountSummaryList.push({
             id: account.id,

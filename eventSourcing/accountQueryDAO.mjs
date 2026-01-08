@@ -16,6 +16,8 @@ export const accountQueryDAO = {
     },
     restore(id) {
         let account = ACCOUNT_LIST.find(a => a.id == id)
-        return new Account(account.id, account.lastName, account.firstName, account.creationDate)
+        if (account) {
+            return new Account(account.id, account.lastName, account.firstName, account.creationDate)
+        }
     }
 };
