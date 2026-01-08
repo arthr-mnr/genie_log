@@ -9,7 +9,6 @@ import { eventStore } from "./eventStore.mjs";
 export const accountCommand = {
     addAccount(lastName, firstName) {
         const account = new Account(null, lastName, firstName, null);
-        // accountCommandDAO.insertAccount(account);
 
         const event = new Event(
             "accountAdded",
@@ -18,15 +17,6 @@ export const accountCommand = {
         );
 
         eventStore.addEvent(event)
-
-        queryDatabase.accountSummaryList.push({
-            id: account.id,
-            lastName: account.lastName,
-            firstName: account.firstName
-        });
-        accountCache[account.id] = {
-            name: account.lastName + ' ' + account.firstName
-        };
 
     },
     saveAccount(id, lastName, firstName) {

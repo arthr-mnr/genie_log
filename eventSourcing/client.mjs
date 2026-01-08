@@ -5,12 +5,12 @@ import { eventStore } from "./eventStore.mjs";
 accountCommand.addAccount("Rajot", "Paul")
 accountCommand.addAccount("Rajot", "Paulllll")
 
-let liste = accountQuery.getAccountList()
+let liste = eventStore.eventList
 console.log(liste)
 
-accountCommand.saveAccount(liste[1].id, "Meunier", "Arthur")
+accountCommand.saveAccount(liste[1].accountId, "Meunier", "Arthur")
 
-let account = accountQuery.getAccount(liste[1].id)
+let account = liste[1].payload
 console.log("Compte :")
 console.log(account)
 
