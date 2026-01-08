@@ -15,7 +15,6 @@ export const accountCommand = {
             "accountAdded",
             account.id,
             account,
-            account.creationDate
         );
 
         eventStore.addEvent(event)
