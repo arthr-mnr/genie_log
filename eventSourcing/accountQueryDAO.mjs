@@ -12,7 +12,9 @@ export const accountQueryDAO = {
         return accountCache[id]
     },
     restore(id) {
-        let account = eventStore.eventList.find(a => a.accountId === id).payload
+        let account = eventStore.eventList
+            .filter(a => a.accountId === id)
+            .sort((a, b) => b.creationDate - a.creationDate)[0].payload
         return new Account(id, account.lastName, account.firstName, account.creationDate)
     }
 };
